@@ -1,5 +1,6 @@
 package com.wearableshackathon.peoplewatch;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -38,7 +42,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void update(long location) {
+
         Log.i("Location", String.valueOf(location));
+        new CheckInLocation().execute("0", String.valueOf(location));
     }
 
 
@@ -62,5 +68,48 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private class CheckInLocation extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            List<String> params = new ArrayList<String>();
+            for (String s : urls){
+                params.add(s);
+            }
+
+            String user = params.get(0);
+            String location = params.get(1);
+            // params comes from the execute() call: params[0] is the url.
+            ServerHelper s = new ServerHelper();
+            s.checkIn(user,location);
+            return "";
+
+        }
+    }
+
+    private class UpdateUserLocation extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            // params comes from the execute() call: params[0] is the url.
+            ServerHelper s = new ServerHelper();
+            String[] newLocations = s.getUserLocations();
+            StringBuffer locationString = new StringBuffer();
+            boolean isFirst = true;
+            for (int i = 0; i < newLocations.length; i++){
+                if (isFirst){
+                    isFirst=false;
+                } else {
+                    locationString.append(":");
+                }
+                locationString.append(newLocations[i]);
+            }
+            String resultString = locationString.toString();
+            Log.i("Result String", resultString);
+            return resultString;
+
+        }
     }
 }

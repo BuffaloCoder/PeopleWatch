@@ -33,21 +33,31 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        final Spinner spinnerPlaces = (Spinner) findViewById(R.id.places);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> adapterPlaces = ArrayAdapter.createFromResource(this,
                 R.array.places, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterPlaces.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        spinnerPlaces.setAdapter(adapterPlaces);
+
+        final Spinner spinnerUsers = (Spinner) findViewById(R.id.users);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapterUsers = ArrayAdapter.createFromResource(this,
+                R.array.users, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapterUsers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinnerUsers.setAdapter(adapterUsers);
 
         Button button = (Button) findViewById(R.id.updateButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                long location = spinner.getSelectedItemId();
-                update(location);
+                long location = spinnerPlaces.getSelectedItemId();
+                long user = spinnerUsers.getSelectedItemId();
+                update(location, user);
             }
         });
         // Build a new GoogleApiClient
@@ -86,10 +96,10 @@ public class MainActivity extends ActionBarActivity implements
 
     }
 
-    private void update(long location) {
+    private void update(long location, long user) {
 
         Log.i("Location", String.valueOf(location));
-        new CheckInLocation().execute("0", String.valueOf(location));
+        new CheckInLocation().execute(String.valueOf(user), String.valueOf(location));
 
 
         new SendToDataLayerThread("/message_path", String.valueOf(location)).start();

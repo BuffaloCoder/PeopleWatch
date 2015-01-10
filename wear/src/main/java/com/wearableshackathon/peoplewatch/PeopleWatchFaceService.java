@@ -18,6 +18,7 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 
 import java.util.concurrent.TimeUnit;
@@ -124,6 +125,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_SHORT)
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
+                    .setStatusBarGravity(Gravity.CENTER_VERTICAL)
                     .build());
 
             Resources resources = PeopleWatchFaceService.this.getResources();

@@ -6,7 +6,13 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner"
+        android:id="@+id/places"
+        android:layout_gravity="center_horizontal" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/users"
         android:layout_gravity="center_horizontal" />
 
     <Button

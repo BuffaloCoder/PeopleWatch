@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.RectF;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,15 +17,10 @@ import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.text.format.Time;
 
-import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -123,6 +120,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 {2, 2},
                 {3, 3}
         };
+        //
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -166,6 +164,18 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             mGreenHand.setStrokeCap(Paint.Cap.ROUND);
 
             mTime = new Time();
+
+            IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
+            MessageReceiver messageReceiver = new MessageReceiver();
+            PeopleWatchFaceService.this.registerReceiver(messageReceiver, messageFilter);
+        }
+
+        public class MessageReceiver extends BroadcastReceiver {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("message");
+                Log.i("Message", message);
+            }
         }
 
         @Override
@@ -303,8 +313,8 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 return;
             }
             mRegisteredTimeZoneReceiver = true;
-            IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-            PeopleWatchFaceService.this.registerReceiver(mLocationReceiver, filter);
+            IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
+            PeopleWatchFaceService.this.registerReceiver(mLocationReceiver, messageFilter);
         }
 
         private void unregisterReceiver() {

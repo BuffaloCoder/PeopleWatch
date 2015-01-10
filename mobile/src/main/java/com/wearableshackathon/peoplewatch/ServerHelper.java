@@ -15,8 +15,8 @@ import java.io.IOException;
  */
 public class ServerHelper {
 
-    private String checkinURL = "http://10.0.2.2:5000/update?";
-    private String updateURL = "http://10.0.2.2:5000/locations";
+    private String checkinURL = "http://localhost:5000/update?";
+    private String updateURL = "http://localhost:5000/locations";
 
     /**
      * Updates the user's location value on server

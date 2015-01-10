@@ -23,6 +23,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.format.Time;
 
+import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +82,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             }
         };
 
-        final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
+        final BroadcastReceiver mLocationReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 mTime.clear(intent.getStringExtra("time-zone"));
@@ -104,6 +105,24 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
         Paint mBlueHand;
         Paint mYellowHand;
         Paint mGreenHand;
+
+        float[] fixedPositions = {
+                0f,
+                (45/180f),
+                (90/180f),
+                (135/180f),
+                (180/180f),
+                (225/180f),
+                (270/180f),
+                (315/180f)
+        };
+
+        int[][] userPositions = {
+                {0, 0},
+                {1, 1},
+                {2, 2},
+                {3, 3}
+        };
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -208,7 +227,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
-            mTime.setToNow();
 
             int width = bounds.width();
             int height = bounds.height();
@@ -225,48 +243,38 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             // Find the center. Ignore the window insets so that, on round watches with a
             // "chin", the watch face is centered on the entire screen, not just the usable
             // portion.
+
             float centerX = width / 2f;
             float centerY = height / 2f;
-            RectF greenHand = new RectF(0, 20, 5.f, 0);
-
-            // Draw the ticks.
-            float innerTickRadius = centerX - 10;
-            float outerTickRadius = centerX;
-            for (int tickIndex = 0; tickIndex < 12; tickIndex++) {
-                float tickRot = (float) (tickIndex * Math.PI * 2 / 12);
-                float innerX = (float) Math.sin(tickRot) * innerTickRadius;
-                float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
-                float outerX = (float) Math.sin(tickRot) * outerTickRadius;
-                float outerY = (float) -Math.cos(tickRot) * outerTickRadius;
-                canvas.drawLine(centerX + innerX, centerY + innerY,
-                        centerX + outerX, centerY + outerY, mYellowHand);
-            }
-
-            float secRot = mTime.second / 30f * (float) Math.PI;
-            int minutes = mTime.minute;
-            float minRot = minutes / 30f * (float) Math.PI;
-            float hrRot = ((mTime.hour + (minutes / 60f)) / 6f ) * (float) Math.PI;
 
             float secLength = centerX - 20;
             float minLength = centerX - 40;
             float hrLength = centerX - 80;
 
-            if (!isInAmbientMode()) {
-                float secX = (float) Math.sin(secRot) * secLength;
-                float secY = (float) -Math.cos(secRot) * secLength;
-                canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mBlueHand);
+            // Blue 0
+            // Green 1
+            // Red 2
+            // Yellow 3
+            int blueUser = userPositions[0][0];
+            float secRot = (fixedPositions[blueUser]) * (float) Math.PI;
+            float secX = (float) Math.sin(secRot) * secLength;
+            float secY = (float) -Math.cos(secRot) * secLength;
+            canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mBlueHand);
 
-            }
 
-            float minX = (float) Math.sin(minRot) * minLength;
-            float minY = (float) -Math.cos(minRot) * minLength;
-            canvas.drawLine(centerX, centerY, centerX + minX, centerY + minY, mGreenHand);
+            int greenUser = userPositions[1][0];
+            secRot = (fixedPositions[greenUser]) * (float) Math.PI;
+            secX = (float) Math.sin(secRot) * minLength;
+            secY = (float) -Math.cos(secRot) * minLength;
+            canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mGreenHand);
 //            RectF change = new RectF(centerX, centerY, centerX + minX, centerY + minY);
 //            canvas.drawBitmap(mGreenHand, null, change, null);
 
-            float hrX = (float) Math.sin(hrRot) * hrLength;
-            float hrY = (float) -Math.cos(hrRot) * hrLength;
-            canvas.drawLine(centerX, centerY, centerX + hrX, centerY + hrY, mRedHand);
+            int redUser = userPositions[2][0];
+            secRot = (fixedPositions[redUser]) * (float) Math.PI;
+            secX = (float) Math.sin(secRot) * hrLength;
+            secY = (float) -Math.cos(secRot) * hrLength;
+            canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mRedHand);
         }
 
         @Override
@@ -297,7 +305,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             }
             mRegisteredTimeZoneReceiver = true;
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-            PeopleWatchFaceService.this.registerReceiver(mTimeZoneReceiver, filter);
+            PeopleWatchFaceService.this.registerReceiver(mLocationReceiver, filter);
         }
 
         private void unregisterReceiver() {
@@ -305,7 +313,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 return;
             }
             mRegisteredTimeZoneReceiver = false;
-            PeopleWatchFaceService.this.unregisterReceiver(mTimeZoneReceiver);
+            PeopleWatchFaceService.this.unregisterReceiver(mLocationReceiver);
         }
 
         /**

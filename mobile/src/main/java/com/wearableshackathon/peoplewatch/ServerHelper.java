@@ -1,7 +1,5 @@
 package com.wearableshackathon.peoplewatch;
 
-import android.util.Log;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -17,10 +15,14 @@ import java.io.IOException;
  */
 public class ServerHelper {
 
-    private String checkinURL = "http://10.0.2.2:5000/update";
+    private String checkinURL = "http://10.0.2.2:5000/update?";
     private String updateURL = "http://10.0.2.2:5000/locations";
-    private String tempURL = "localhost:5000/update?user=0&location=home";
 
+    /**
+     * Updates the user's location value on server
+     * @param user number value of user in string format
+     * @param location location value in string format
+     */
     public void checkIn(String user, String location) {
         String checkInURLParams = checkinURL + "user=" + user + "&location=" + location;
         try {
@@ -30,6 +32,10 @@ public class ServerHelper {
         }
     }
 
+    /**
+     * Gets an array containing the string values of the user's locations
+     * @return an array containing the values of locations
+     */
     public String[] getUserLocations() {
         String[] results = new String[2];
         try {
@@ -39,8 +45,8 @@ public class ServerHelper {
             for (int i = 0; i < users.length; i++){
                 String temp = users[i];
                 String[] splitInfo = temp.split(":");
-                results[i] = splitInfo[1];
-                Log.i("user info", splitInfo[0] + ":" + splitInfo[1]);
+                results[i] = splitInfo[1].replace("\"","");
+//                Log.i("user info", splitInfo[0] + "-" + results[i]);
             }
 
         } catch (IOException e) {
@@ -60,7 +66,7 @@ public class ServerHelper {
             response.getEntity().writeTo(out);
             out.close();
             String responseString = out.toString();
-            Log.i("Message From Server", responseString);
+//            Log.i("Message From Server", responseString);
             return responseString;
         } else {
             //Closes the connection.

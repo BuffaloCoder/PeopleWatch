@@ -21,6 +21,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -156,6 +158,16 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             mGreenHand.setAntiAlias(true);
             mGreenHand.setStrokeCap(Paint.Cap.ROUND);
 
+            Timer timer = new Timer();
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+
+                synchronized public void run() {
+                    invalidate();
+                    Log.i("User0", String.valueOf(userPositions[0]));
+                }
+
+            }, 0, 1000);
         }
 
 
@@ -188,6 +200,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "onTimeTick: ambient = " + isInAmbientMode());
             }
+            invalidate();
         }
 
         @Override
@@ -204,6 +217,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 mYellowHand.setAntiAlias(antiAlias);
             }
             invalidate();
+            updateTimer();
         }
 
         @Override
@@ -302,6 +316,20 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             }
             mRegisteredLocationReceiver = false;
             PeopleWatchFaceService.this.unregisterReceiver(mLocationReceiver);
+        }
+
+        /**
+         * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
+         * or stops it if it shouldn't be running but currently is.
+         */
+        private void updateTimer() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "updateTimer");
+            }
+            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            if (shouldTimerBeRunning()) {
+                mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+            }
         }
 
         /**

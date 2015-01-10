@@ -80,10 +80,13 @@ public class MainActivity extends ActionBarActivity {
             }
 
             String user = params.get(0);
+            Log.i("ServerHelper-UserValue", user);
             String location = params.get(1);
+            Log.i("ServerHelper-LocationValue", user);
             // params comes from the execute() call: params[0] is the url.
             ServerHelper s = new ServerHelper();
             s.checkIn(user,location);
+            Log.i("ServerHelper", "after checkIn call");
             return "";
 
         }

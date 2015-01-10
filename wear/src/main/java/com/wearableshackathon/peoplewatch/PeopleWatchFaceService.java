@@ -17,26 +17,17 @@ import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by ericj on 1/10/15.
+ * author: ericj
+ * Creates new watchface showing locations.
  */
 public class PeopleWatchFaceService extends CanvasWatchFaceService {
     private static final String TAG = "PeopleWatchFaceService";
-
-    static final int MSG_UPDATE_TIME = 0;
-
-
-
-    /* device features */
-    boolean mLowBitAmbient;
-
 
     /**
      * Update rate in milliseconds for interactive mode. We update once a second to advance the

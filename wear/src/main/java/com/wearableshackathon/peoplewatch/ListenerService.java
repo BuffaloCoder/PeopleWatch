@@ -19,6 +19,8 @@ public class ListenerService extends WearableListenerService {
             messageIntent.setAction(Intent.ACTION_SEND);
             messageIntent.putExtra("message", message);
             LocalBroadcastManager.getInstance(this).sendBroadcast(messageIntent);
+
+            PeopleWatchFaceService.update(message);
         }
         else {
             super.onMessageReceived(messageEvent);

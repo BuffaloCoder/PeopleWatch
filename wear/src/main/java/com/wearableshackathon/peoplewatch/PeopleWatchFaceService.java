@@ -35,6 +35,14 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
      */
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
 
+    static int[] userPositions = {0,1,2,3};
+
+    static public void update(String message) {
+        Log.i("message", message);
+        String[] array = message.split(":");
+        userPositions[Integer.parseInt(array[0])] = Integer.parseInt(array[1]);
+    }
+
     @Override
     public Engine onCreateEngine() {
         /* provide your watch face implementation */
@@ -103,13 +111,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 (270/180f),
                 (315/180f)
         };
-
-        int[][] userPositions = {
-                {0, 0},
-                {1, 1},
-                {2, 2},
-                {3, 3}
-        };
         //
 
         @Override
@@ -153,10 +154,8 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             mGreenHand.setAntiAlias(true);
             mGreenHand.setStrokeCap(Paint.Cap.ROUND);
 
-            IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
-            MessageReceiver messageReceiver = new MessageReceiver();
-            PeopleWatchFaceService.this.registerReceiver(messageReceiver, messageFilter);
         }
+
 
         public class MessageReceiver extends BroadcastReceiver {
             @Override
@@ -248,14 +247,14 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             // Green 1
             // Red 2
             // Yellow 3
-            int blueUser = userPositions[0][0];
+            int blueUser = userPositions[0];
             float secRot = (fixedPositions[blueUser]) * (float) Math.PI;
             float secX = (float) Math.sin(secRot) * secLength;
             float secY = (float) -Math.cos(secRot) * secLength;
             canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mBlueHand);
 
 
-            int greenUser = userPositions[1][0];
+            int greenUser = userPositions[1];
             secRot = (fixedPositions[greenUser]) * (float) Math.PI;
             secX = (float) Math.sin(secRot) * minLength;
             secY = (float) -Math.cos(secRot) * minLength;
@@ -263,7 +262,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
 //            RectF change = new RectF(centerX, centerY, centerX + minX, centerY + minY);
 //            canvas.drawBitmap(mGreenHand, null, change, null);
 
-            int redUser = userPositions[2][0];
+            int redUser = userPositions[2];
             secRot = (fixedPositions[redUser]) * (float) Math.PI;
             secX = (float) Math.sin(secRot) * hrLength;
             secY = (float) -Math.cos(secRot) * hrLength;

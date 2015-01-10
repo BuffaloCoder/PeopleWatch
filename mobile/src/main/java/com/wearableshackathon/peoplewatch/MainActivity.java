@@ -101,8 +101,8 @@ public class MainActivity extends ActionBarActivity implements
         Log.i("Location", String.valueOf(location));
         new CheckInLocation().execute(String.valueOf(user), String.valueOf(location));
 
-
-        new SendToDataLayerThread("/message_path", String.valueOf(location)).start();
+        String message = String.valueOf(location) + ":" + String.valueOf(user);
+        new SendToDataLayerThread("/message_path", message).start();
     }
 
 

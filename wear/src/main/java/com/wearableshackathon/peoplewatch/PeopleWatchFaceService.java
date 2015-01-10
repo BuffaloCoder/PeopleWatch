@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -56,10 +57,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
         static final int MSG_UPDATE_TIME = 0;
 
-        Paint mHourPaint;
-        Paint mMinutePaint;
-        Paint mSecondPaint;
-        Paint mTickPaint;
         boolean mMute;
         Time mTime;
 
@@ -103,10 +100,10 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
         Bitmap mBackgroundBitmap;
         Bitmap mBackgroundScaledBitmap;
 
-        Bitmap mRedHand;
-        Bitmap mBlueHand;
-        Bitmap mYellowHand;
-        Bitmap mGreenHand;
+        Paint mRedHand;
+        Paint mBlueHand;
+        Paint mYellowHand;
+        Paint mGreenHand;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -122,43 +119,32 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                     .build());
 
             Resources resources = PeopleWatchFaceService.this.getResources();
-            Drawable backgroundDrawable = resources.getDrawable(R.drawable.clockface);
+            Drawable backgroundDrawable = resources.getDrawable(R.drawable.roundcon);
             mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
 
-            Drawable mRedHand = resources.getDrawable(R.drawable.clockface);
-            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
+            mRedHand = new Paint();
+            mRedHand.setARGB(255, 255, 200, 200);
+            mRedHand.setStrokeWidth(5.f);
+            mRedHand.setAntiAlias(true);
+            mRedHand.setStrokeCap(Paint.Cap.ROUND);
 
-            Drawable mBlueHand = resources.getDrawable(R.drawable.clockface);
-            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
+            mBlueHand = new Paint();
+            mBlueHand.setARGB(255, 0, 0, 255);
+            mBlueHand.setStrokeWidth(5.f);
+            mBlueHand.setAntiAlias(true);
+            mBlueHand.setStrokeCap(Paint.Cap.ROUND);
 
-            Drawable mYellowHand = resources.getDrawable(R.drawable.clockface);
-            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
+            mYellowHand = new Paint();
+            mYellowHand.setARGB(255, 200, 200, 200);
+            mYellowHand.setStrokeWidth(5.f);
+            mYellowHand.setAntiAlias(true);
+            mYellowHand.setStrokeCap(Paint.Cap.ROUND);
 
-            Drawable mGreenHand = resources.getDrawable(R.drawable.clockface);
-            mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
-
-            mHourPaint = new Paint();
-            mHourPaint.setARGB(255, 200, 200, 200);
-            mHourPaint.setStrokeWidth(5.f);
-            mHourPaint.setAntiAlias(true);
-            mHourPaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mMinutePaint = new Paint();
-            mMinutePaint.setARGB(255, 200, 200, 200);
-            mMinutePaint.setStrokeWidth(3.f);
-            mMinutePaint.setAntiAlias(true);
-            mMinutePaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mSecondPaint = new Paint();
-            mSecondPaint.setARGB(255, 255, 0, 0);
-            mSecondPaint.setStrokeWidth(2.f);
-            mSecondPaint.setAntiAlias(true);
-            mSecondPaint.setStrokeCap(Paint.Cap.ROUND);
-
-            mTickPaint = new Paint();
-            mTickPaint.setARGB(100, 255, 255, 255);
-            mTickPaint.setStrokeWidth(2.f);
-            mTickPaint.setAntiAlias(true);
+            mGreenHand = new Paint();
+            mGreenHand.setARGB(255, 0, 255, 0);
+            mGreenHand.setStrokeWidth(5.f);
+            mGreenHand.setAntiAlias(true);
+            mGreenHand.setStrokeCap(Paint.Cap.ROUND);
 
             mTime = new Time();
         }
@@ -195,10 +181,10 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             }
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
-                mHourPaint.setAntiAlias(antiAlias);
-                mMinutePaint.setAntiAlias(antiAlias);
-                mSecondPaint.setAntiAlias(antiAlias);
-                mTickPaint.setAntiAlias(antiAlias);
+                mGreenHand.setAntiAlias(antiAlias);
+                mBlueHand.setAntiAlias(antiAlias);
+                mRedHand.setAntiAlias(antiAlias);
+                mYellowHand.setAntiAlias(antiAlias);
             }
             invalidate();
 
@@ -213,9 +199,9 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             boolean inMuteMode = (interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE);
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
-                mHourPaint.setAlpha(inMuteMode ? 100 : 255);
-                mMinutePaint.setAlpha(inMuteMode ? 100 : 255);
-                mSecondPaint.setAlpha(inMuteMode ? 80 : 255);
+                mRedHand.setAlpha(inMuteMode ? 100 : 255);
+                mGreenHand.setAlpha(inMuteMode ? 100 : 255);
+                mBlueHand.setAlpha(inMuteMode ? 80 : 255);
                 invalidate();
             }
         }
@@ -241,6 +227,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             // portion.
             float centerX = width / 2f;
             float centerY = height / 2f;
+            RectF greenHand = new RectF(0, 20, 5.f, 0);
 
             // Draw the ticks.
             float innerTickRadius = centerX - 10;
@@ -252,7 +239,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 float outerX = (float) Math.sin(tickRot) * outerTickRadius;
                 float outerY = (float) -Math.cos(tickRot) * outerTickRadius;
                 canvas.drawLine(centerX + innerX, centerY + innerY,
-                        centerX + outerX, centerY + outerY, mTickPaint);
+                        centerX + outerX, centerY + outerY, mYellowHand);
             }
 
             float secRot = mTime.second / 30f * (float) Math.PI;
@@ -267,16 +254,19 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             if (!isInAmbientMode()) {
                 float secX = (float) Math.sin(secRot) * secLength;
                 float secY = (float) -Math.cos(secRot) * secLength;
-                canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mSecondPaint);
+                canvas.drawLine(centerX, centerY, centerX + secX, centerY + secY, mBlueHand);
+
             }
 
             float minX = (float) Math.sin(minRot) * minLength;
             float minY = (float) -Math.cos(minRot) * minLength;
-            canvas.drawLine(centerX, centerY, centerX + minX, centerY + minY, mMinutePaint);
+            canvas.drawLine(centerX, centerY, centerX + minX, centerY + minY, mGreenHand);
+//            RectF change = new RectF(centerX, centerY, centerX + minX, centerY + minY);
+//            canvas.drawBitmap(mGreenHand, null, change, null);
 
             float hrX = (float) Math.sin(hrRot) * hrLength;
             float hrY = (float) -Math.cos(hrRot) * hrLength;
-            canvas.drawLine(centerX, centerY, centerX + hrX, centerY + hrY, mHourPaint);
+            canvas.drawLine(centerX, centerY, centerX + hrX, centerY + hrY, mRedHand);
         }
 
         @Override

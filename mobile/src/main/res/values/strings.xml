@@ -1,3 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">PeopleWatch</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="places">
+        <item>Home</item>
+        <item>Coffee</item>
+        <item>Shopping</item>
+        <item>Friends</item>
+        <item>Unknown</item>
+        <item>Food</item>
+        <item>School</item>
+        <item>Danger</item>
+    </string-array>
 </resources>

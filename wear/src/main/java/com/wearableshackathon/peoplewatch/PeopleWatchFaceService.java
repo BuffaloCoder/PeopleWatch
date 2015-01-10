@@ -32,8 +32,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
 
     static final int MSG_UPDATE_TIME = 0;
 
-    /* a time object */
-    Time mTime;
+
 
     /* device features */
     boolean mLowBitAmbient;
@@ -56,7 +55,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
         static final int MSG_UPDATE_TIME = 0;
 
         boolean mMute;
-        Time mTime;
 
         /** Handler to update the time once a second in interactive mode. */
         final Handler mUpdateTimeHandler = new Handler() {
@@ -82,11 +80,12 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
         final BroadcastReceiver mLocationReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mTime.clear(intent.getStringExtra("time-zone"));
-                mTime.setToNow();
+                String message = intent.getStringExtra("message");
+                Log.i("mLocationReceiver", message);
+
             }
         };
-        boolean mRegisteredTimeZoneReceiver = false;
+        boolean mRegisteredLocationReceiver = false;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -163,8 +162,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             mGreenHand.setAntiAlias(true);
             mGreenHand.setStrokeCap(Paint.Cap.ROUND);
 
-            mTime = new Time();
-
             IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
             MessageReceiver messageReceiver = new MessageReceiver();
             PeopleWatchFaceService.this.registerReceiver(messageReceiver, messageFilter);
@@ -215,10 +212,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                 mYellowHand.setAntiAlias(antiAlias);
             }
             invalidate();
-
-            // Whether the timer should be running depends on whether we're in ambient mode (as well
-            // as whether we're visible), so we may need to start or stop the timer.
-            updateTimer();
         }
 
         @Override
@@ -296,47 +289,27 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             if (visible) {
                 registerReceiver();
 
-                // Update time zone in case it changed while we weren't visible.
-                mTime.clear(TimeZone.getDefault().getID());
-                mTime.setToNow();
             } else {
                 unregisterReceiver();
             }
 
-            // Whether the timer should be running depends on whether we're visible (as well as
-            // whether we're in ambient mode), so we may need to start or stop the timer.
-            updateTimer();
         }
 
         private void registerReceiver() {
-            if (mRegisteredTimeZoneReceiver) {
+            if (mRegisteredLocationReceiver) {
                 return;
             }
-            mRegisteredTimeZoneReceiver = true;
+            mRegisteredLocationReceiver = true;
             IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
             PeopleWatchFaceService.this.registerReceiver(mLocationReceiver, messageFilter);
         }
 
         private void unregisterReceiver() {
-            if (!mRegisteredTimeZoneReceiver) {
+            if (!mRegisteredLocationReceiver) {
                 return;
             }
-            mRegisteredTimeZoneReceiver = false;
+            mRegisteredLocationReceiver = false;
             PeopleWatchFaceService.this.unregisterReceiver(mLocationReceiver);
-        }
-
-        /**
-         * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
-         * or stops it if it shouldn't be running but currently is.
-         */
-        private void updateTimer() {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "updateTimer");
-            }
-            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
-            if (shouldTimerBeRunning()) {
-                mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
-            }
         }
 
         /**

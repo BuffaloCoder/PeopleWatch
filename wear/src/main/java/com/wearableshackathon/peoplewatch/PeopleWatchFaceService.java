@@ -128,6 +128,7 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .setStatusBarGravity(Gravity.CENTER_VERTICAL)
+                    .setHotwordIndicatorGravity(Gravity.CENTER_VERTICAL)
                     .build());
 
             Resources resources = PeopleWatchFaceService.this.getResources();

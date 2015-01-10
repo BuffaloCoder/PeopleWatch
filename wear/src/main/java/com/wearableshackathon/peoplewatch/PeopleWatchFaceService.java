@@ -189,7 +189,6 @@ public class PeopleWatchFaceService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "onTimeTick: ambient = " + isInAmbientMode());
             }
-            invalidate();
         }
 
         @Override
